@@ -10,6 +10,7 @@ import SignUp from './src/SignUp';
 import FootSize from './src/FootSize';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import usePermissions from './src/hooks/userPermissions';
 
 export type RootStackParamList = {
   SignIn: undefined;
@@ -20,6 +21,8 @@ export type RootStackParamList = {
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator<RootStackParamList>();
 function App() {
+  usePermissions();
+  
   return (
           <NavigationContainer>
             <Tab.Navigator>
@@ -31,7 +34,7 @@ function App() {
                   tabBarIcon: () => <MaterialCommunityIcons name="file-sign" size={20} />,
                 }}
               />
-              
+
               <Tab.Screen
                 name="SignIn"
                 component={SignIn}

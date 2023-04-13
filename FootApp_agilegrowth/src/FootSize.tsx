@@ -1,158 +1,89 @@
-import React, {useCallback, useRef, useState} from 'react';
+import React, {useCallback, useState, useRef} from 'react';
 import {
-  Alert,
-  Platform,
+  Dimensions,
+  Image,
   Pressable,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from 'react-native';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {RootStackParamList} from '../App';
-import DismissKeyboardView from './DismissKeyBoardView';
+import ImageResizer from 'react-native-image-resizer';
+import { RNCamera } from 'react-native-camera';
 
 function FootSize() {
-  const [email, setEmail] = useState('');
-  const [name, setName] = useState('');
-  const [password, setPassword] = useState('');
-  const emailRef = useRef<TextInput | null>(null);
-  const nameRef = useRef<TextInput | null>(null);
-  const passwordRef = useRef<TextInput | null>(null);
+  const cameraRef = useRef<RNCamera>(null);
+  const [preview, setPreview] = useState<{uri: string}>();
 
-  const onChangeEmail = useCallback((text:string) => {
-    setEmail(text.trim());
-  }, []);
-  const onChangeName = useCallback((text: string) => {
-    setName(text.trim());
-  }, []);
-  const onChangePassword = useCallback((text: string) => {
-    setPassword(text.trim());
-  }, []);
-  const onSubmit = useCallback(() => {
-    if (!email || !email.trim()) {
-      return Alert.alert('알림', '이메일을 입력해주세요.');
+  const onTakePhoto = useCallback(async() => {
+    if(cameraRef.current){
+      const data = await cameraRef.current.takePictureAsync({
+        quality: 1, base64: true,
+      })
+      setPreview({uri: data.uri});
     }
-    if (!name || !name.trim()) {
-      return Alert.alert('알림', '이름을 입력해주세요.');
-    }
-    if (!password || !password.trim()) {
-      return Alert.alert('알림', '비밀번호를 입력해주세요.');
-    }
-    if (
-      !/^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/.test(
-        email,
-      )
-    ) {
-      return Alert.alert('알림', '올바른 이메일 주소가 아닙니다.');
-    }
-    if (!/^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[$@^!%*#?&]).{8,50}$/.test(password)) {
-      return Alert.alert(
-        '알림',
-        '비밀번호는 영문,숫자,특수문자($@^!%*#?&)를 모두 포함하여 8자 이상 입력해야합니다.',
-      );
-    }
-    console.log(email, name, password);
-    Alert.alert('알림', '회원가입 되었습니다.');
-  }, [email, name, password]);
+  }, [preview]);
 
-  const canGoNext = email && name && password;
   return (
-    <DismissKeyboardView>
-      <View style={styles.inputWrapper}>
-        <Text style={styles.label}>이메일</Text>
-        <TextInput
-          style={styles.textInput}
-          onChangeText={onChangeEmail}
-          placeholder="이메일을 입력해주세요"
-          placeholderTextColor="#666"
-          textContentType="emailAddress"
-          value={email}
-          returnKeyType="next"
-          clearButtonMode="while-editing"
-          ref={emailRef}
-          onSubmitEditing={() => nameRef.current?.focus()}
-          blurOnSubmit={false}
-        />
-      </View>
-      <View style={styles.inputWrapper}>
-        <Text style={styles.label}>이름</Text>
-        <TextInput
-          style={styles.textInput}
-          placeholder="이름을 입력해주세요."
-          placeholderTextColor="#666"
-          onChangeText={onChangeName}
-          value={name}
-          textContentType="name"
-          returnKeyType="next"
-          clearButtonMode="while-editing"
-          ref={nameRef}
-          onSubmitEditing={() => passwordRef.current?.focus()}
-          blurOnSubmit={false}
-        />
-      </View>
-      <View style={styles.inputWrapper}>
-        <Text style={styles.label}>비밀번호</Text>
-        <TextInput
-          style={styles.textInput}
-          placeholder="비밀번호를 입력해주세요(영문,숫자,특수문자)"
-          placeholderTextColor="#666"
-          onChangeText={onChangePassword}
-          value={password}
-          keyboardType={Platform.OS === 'android' ? 'default' : 'ascii-capable'}
-          textContentType="password"
-          secureTextEntry
-          returnKeyType="send"
-          clearButtonMode="while-editing"
-          ref={passwordRef}
-          onSubmitEditing={onSubmit}
-        />
-      </View>
-      <View style={styles.buttonZone}>
-        <Pressable
-          style={
-            canGoNext
-              ? StyleSheet.compose(styles.loginButton, styles.loginButtonActive)
-              : styles.loginButton
-          }
-          disabled={!canGoNext}
-          onPress={onSubmit}>
-          <Text style={styles.loginButtonText}>회원가입</Text>
-        </Pressable>
-      </View>
-    </DismissKeyboardView>
+    <View style={{flex: 1}}>
+      {!preview ?
+        (
+          <>
+            <RNCamera ref={cameraRef} style={{ flex:1 }} type={RNCamera.Constants.Type.back}>
+              <View>
+                <Image 
+                  source={require('/Users/agile/Desktop/dohyun/FootApp_agilegrowth/src/img/foot.jpeg')}
+                  style={{ width: 100, height: 100 }}
+                />
+              </View>
+            </RNCamera>
+            <View style={styles.buttonWrapper}>
+              <Pressable style={styles.button} onPress={onTakePhoto}>
+                <Text style={styles.buttonText}>이미지 촬영</Text>
+              </Pressable>
+            </View>
+          </>
+        )
+        :
+        (
+          <View style={styles.preview}>
+            <Image style={styles.previewImage} source={preview} />
+          </View>
+        )
+      }
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  textInput: {
-    padding: 5,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-  },
-  inputWrapper: {
+  foot: {
     padding: 20,
   },
-  label: {
-    fontWeight: 'bold',
-    fontSize: 16,
-    marginBottom: 20,
-  },
-  buttonZone: {
-    alignItems: 'center',
-  },
-  loginButton: {
-    backgroundColor: 'gray',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 5,
+  preview: {
+    marginHorizontal: 10,
+    width: Dimensions.get('window').width - 20,
+    height: Dimensions.get('window').height / 3,
+    backgroundColor: '#D2D2D2',
     marginBottom: 10,
   },
-  loginButtonActive: {
-    backgroundColor: 'blue',
+  previewImage: {
+    height: Dimensions.get('window').height / 3,
+    resizeMode: 'contain',
   },
-  loginButtonText: {
-    color: 'white',
-    fontSize: 16,
+  buttonWrapper: {flexDirection: 'row', justifyContent: 'center'},
+  button: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    width: 120,
+    alignItems: 'center',
+    backgroundColor: 'yellow',
+    borderRadius: 5,
+    margin: 5,
+  },
+  buttonText: {
+    color: 'black',
+  },
+  buttonDisabled: {
+    backgroundColor: 'gray',
   },
 });
 
