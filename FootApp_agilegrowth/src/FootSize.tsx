@@ -7,7 +7,6 @@ import {
   Text,
   View,
 } from 'react-native';
-import ImageResizer from 'react-native-image-resizer';
 import { RNCamera } from 'react-native-camera';
 
 function FootSize() {
@@ -19,20 +18,25 @@ function FootSize() {
       const data = await cameraRef.current.takePictureAsync({
         quality: 1, base64: true,
       })
+      console.log(data.uri);
       setPreview({uri: data.uri});
     }
   }, [preview]);
 
+  const handleRetake = useCallback(() => {
+    setPreview({uri:''});
+  }, []);
+
   return (
-    <View style={{flex: 1}}>
-      {!preview ?
+    <View style={styles.cam}>
+      {!preview?.uri ?
         (
           <>
             <RNCamera ref={cameraRef} style={{ flex:1 }} type={RNCamera.Constants.Type.back}>
-              <View>
+              <View style={styles.cam}>
                 <Image 
-                  source={require('/Users/agile/Desktop/dohyun/FootApp_agilegrowth/src/img/foot.jpeg')}
-                  style={{ width: 100, height: 100 }}
+                  source={require('/Users/agile/Desktop/dohyun/FootApp_agilegrowth/src/img/original.png')}
+                  style={styles.footimg}
                 />
               </View>
             </RNCamera>
@@ -45,8 +49,12 @@ function FootSize() {
         )
         :
         (
-          <View style={styles.preview}>
+          <View style={styles.cam}>
             <Image style={styles.previewImage} source={preview} />
+            <Text style={styles.buttonText}>255.66mm</Text>
+            <Pressable style={styles.button} onPress={handleRetake}>
+              <Text style={styles.buttonText}>재촬영</Text>
+            </Pressable>
           </View>
         )
       }
@@ -58,15 +66,28 @@ const styles = StyleSheet.create({
   foot: {
     padding: 20,
   },
+  cam: {
+    flex: 1,
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height - 100,
+    justifyContent: 'center', 
+    alignItems: 'center',
+  },
+  footimg: {
+    width: 230 ,
+    height: 300 ,
+    backgroundColor: 'transparent',
+  },
   preview: {
     marginHorizontal: 10,
     width: Dimensions.get('window').width - 20,
-    height: Dimensions.get('window').height / 3,
+    height: Dimensions.get('window').height / 1.5,
     backgroundColor: '#D2D2D2',
     marginBottom: 10,
   },
   previewImage: {
-    height: Dimensions.get('window').height / 3,
+    width: Dimensions.get('window').width ,
+    height: Dimensions.get('window').height - 300,
     resizeMode: 'contain',
   },
   buttonWrapper: {flexDirection: 'row', justifyContent: 'center'},
