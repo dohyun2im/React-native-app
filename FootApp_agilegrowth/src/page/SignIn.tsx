@@ -8,8 +8,8 @@ import {
   View,
 } from 'react-native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import DismissKeyboardView from './DismissKeyBoardView';
-import {RootStackParamList} from '../App';
+import DismissKeyboardView from '../component/DismissKeyBoardView';
+import {RootStackParamList} from '../../App';
 
 function SignIn() {
   const [email, setEmail] = useState('');

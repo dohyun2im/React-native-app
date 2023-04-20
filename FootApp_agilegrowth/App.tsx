@@ -5,12 +5,13 @@ import {
   createNativeStackNavigator,
   NativeStackScreenProps,
 } from '@react-navigation/native-stack';
-import SignIn from './src/SignIn';
-import SignUp from './src/SignUp';
-import FootSize from './src/FootSize';
+import SignIn from './src/page/SignIn';
+import SignUp from './src/page/SignUp';
+import FootSize from './src/page/FootSize';
+import Home from './src/page/Home';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import usePermissions from './src/hooks/userPermissions';
+import SplashScreen from 'react-native-splash-screen';
 
 export type RootStackParamList = {
   SignIn: undefined;
@@ -20,12 +21,17 @@ export type RootStackParamList = {
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator<RootStackParamList>();
-function App() {
+const App = () => {
+
   usePermissions();
-  
+  React.useEffect(() => {
+    setTimeout(()=>{SplashScreen.hide()}, 3000)
+  },[])
+
   return (
+        <>
           <NavigationContainer>
-            <Tab.Navigator>
+            <Tab.Navigator initialRouteName='SignIn'>
               <Tab.Screen
                 name="SignUp"
                 component={SignUp}
@@ -45,6 +51,15 @@ function App() {
               />
 
               <Tab.Screen
+                name="Home"
+                component={Home}
+                options={{
+                  title: '홈',
+                  tabBarIcon: () => <MaterialCommunityIcons name="home" size={20} />,
+                }}
+              />
+
+              <Tab.Screen
                 name="FootSize"
                 component={FootSize}
                 options={{
@@ -54,6 +69,7 @@ function App() {
               />
             </Tab.Navigator>
           </NavigationContainer>
+        </>
   );
 }
 

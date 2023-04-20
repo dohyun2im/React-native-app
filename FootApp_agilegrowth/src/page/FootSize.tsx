@@ -18,7 +18,6 @@ function FootSize() {
       const data = await cameraRef.current.takePictureAsync({
         quality: 1, base64: true,
       })
-      console.log(data.uri);
       setPreview({uri: data.uri});
     }
   }, [preview]);
@@ -74,7 +73,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   footimg: {
-    width: 230 ,
+    width: 320 ,
     height: 300 ,
     backgroundColor: 'transparent',
   },
